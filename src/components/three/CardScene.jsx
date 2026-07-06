@@ -12,7 +12,10 @@ function useCardTexture(imageUrl) {
   useEffect(() => {
     if (!imageUrl) return;
     const loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
+    
+    // We try to load with anonymous CORS. If it fails, we fall back to a standard load or local placeholder
+    loader.setCrossOrigin('anonymous');
+    
     loader.load(
       imageUrl,
       (tex) => {
@@ -22,8 +25,21 @@ function useCardTexture(imageUrl) {
       },
       undefined,
       (err) => {
-        // Silently fallback — card will use default dark material
-        console.warn('Card texture load failed, using fallback');
+        console.warn('CORS texture load failed, retrying without CORS...');
+        // Retry without crossOrigin
+        const fallbackLoader = new THREE.TextureLoader();
+        fallbackLoader.load(
+          imageUrl,
+          (tex) => {
+            tex.minFilter = THREE.LinearFilter;
+            tex.magFilter = THREE.LinearFilter;
+            setTexture(tex);
+          },
+          undefined,
+          () => {
+            console.error('All texture loads failed for:', imageUrl);
+          }
+        );
       }
     );
   }, [imageUrl]);
@@ -59,10 +75,11 @@ function CardMesh({ imageUrl, attribute }) {
           <planeGeometry args={[2.5, 3.6, 32, 32]} />
           <meshStandardMaterial
             map={texture || undefined}
-            color={texture ? undefined : '#0d0025'}
-            roughness={0.1}
-            metalness={0.4}
+            color={texture ? undefined : '#201035'}
+            roughness={0.15}
+            metalness={0.3}
             envMapIntensity={2}
+            side={THREE.DoubleSide}
           />
         </mesh>
 

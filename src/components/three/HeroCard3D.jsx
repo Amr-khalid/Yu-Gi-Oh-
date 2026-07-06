@@ -10,12 +10,25 @@ function useCrossOriginTexture(imageUrl) {
   useEffect(() => {
     if (!imageUrl) return;
     const loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
+    loader.setCrossOrigin('anonymous');
     loader.load(
       imageUrl,
-      (tex) => { tex.minFilter = THREE.LinearFilter; setTexture(tex); },
+      (tex) => {
+        tex.minFilter = THREE.LinearFilter;
+        setTexture(tex);
+      },
       undefined,
-      () => { /* silent fallback */ }
+      () => {
+        console.warn('Hero card CORS load failed, retrying without CORS...');
+        const fallbackLoader = new THREE.TextureLoader();
+        fallbackLoader.load(
+          imageUrl,
+          (tex) => {
+            tex.minFilter = THREE.LinearFilter;
+            setTexture(tex);
+          }
+        );
+      }
     );
     return () => setTexture(null);
   }, [imageUrl]);
