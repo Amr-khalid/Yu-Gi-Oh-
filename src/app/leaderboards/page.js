@@ -150,7 +150,7 @@ export default function LeaderboardsPage() {
         {/* Podium (top 3) */}
         {currentCards.length >= 3 && (
           <motion.div
-            className="grid grid-cols-3 gap-4 mb-8"
+            className="grid grid-cols-3 gap-4 items-end mb-12 max-w-3xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             key={activeTab}
@@ -159,7 +159,11 @@ export default function LeaderboardsPage() {
               const card = currentCards[rank];
               if (!card) return null;
               const theme = getAttributeTheme(card.attribute);
-              const heights = { 0: 'h-44', 1: 'h-36', 2: 'h-32' };
+              const heights = { 
+                0: 'h-[280px] sm:h-[380px]', 
+                1: 'h-[230px] sm:h-[310px]', 
+                2: 'h-[190px] sm:h-[260px]' 
+              };
               const medals = ['🥇', '🥈', '🥉'];
               return (
                 <Link key={card.id} href={`/cards/${card.id}`}>
@@ -172,16 +176,16 @@ export default function LeaderboardsPage() {
                     transition={{ delay: rank * 0.1 }}
                   >
                     <Image
-                      src={getCardImageUrl(card, 'small')}
+                      src={getCardImageUrl(card, 'normal')}
                       alt={card.name}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                       unoptimized
                     />
-                    <div className="absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%)` }} />
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <p className="text-lg">{medals[rank]}</p>
-                      <p className="text-white text-xs font-medium line-clamp-1">{card.name}</p>
+                    <div className="absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 40%, transparent 80%)` }} />
+                    <div className="absolute bottom-2 left-2 right-2 z-10">
+                      <p className="text-base sm:text-lg mb-0.5">{medals[rank]}</p>
+                      <p className="text-white text-xs sm:text-sm font-semibold truncate mb-0.5">{card.name}</p>
                       {card.atk !== undefined && (
                         <p className="text-amber-400 text-xs font-display font-bold">ATK {formatStat(card.atk)}</p>
                       )}
