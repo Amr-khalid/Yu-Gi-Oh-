@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -126,17 +126,20 @@ export default function DeckBuilderPage() {
     if (!q || q.length < 2) { setSearchResults([]); return; }
     setSearching(true);
     try {
-      const res = await searchCardsByName(q, { num: 20 });
+      // Must pass both num and offset to satisfy YGOPRODeck API constraints
+      const res = await searchCardsByName(q, { num: 20, offset: 0 });
       setSearchResults(res?.data || []);
+    } catch (err) {
+      setSearchResults([]);
     } finally {
       setSearching(false);
     }
   }, []);
 
   // auto-search on debounce
-  useState(() => {
+  useEffect(() => {
     handleSearch(debouncedQuery);
-  });
+  }, [debouncedQuery, handleSearch]);
 
   const handleAddCard = (card) => {
     addCardToDeck(card);
