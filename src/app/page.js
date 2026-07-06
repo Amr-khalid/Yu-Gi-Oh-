@@ -58,7 +58,7 @@ export default function HomePage() {
 
   useEffect(() => {
     // Fetch daily featured card (simply get 1 card from info database safely)
-    fetchCards({ num: 1 }).then((res) => {
+    fetchCards({ num: 1, offset: 0 }).then((res) => {
       const card = res?.data?.[0];
       if (card) {
         setDailyCard(card);
@@ -67,7 +67,7 @@ export default function HomePage() {
     }).catch(() => {});
 
     // Fetch top 5 strongest monsters (Fusion, Synchro, XYZ)
-    fetchCards({ num: 100 }).then((res) => {
+    fetchCards({ num: 100, offset: 0 }).then((res) => {
       const apiCards = res?.data || [];
       const filteredTypes = ['xyz monster', 'synchro monster', 'fusion monster'];
       
@@ -94,7 +94,7 @@ export default function HomePage() {
     });
 
     // Fetch newest cards (fetch recent and sort by id desc client-side)
-    fetchCards({ num: 30 }).then((res) => {
+    fetchCards({ num: 30, offset: 0 }).then((res) => {
       const apiCards = res?.data || [];
       const sorted = [...apiCards].sort((a, b) => parseInt(b.id) - parseInt(a.id));
       setNewestCards(sorted.slice(0, 6));

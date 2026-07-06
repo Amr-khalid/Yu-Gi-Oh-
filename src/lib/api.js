@@ -152,12 +152,12 @@ export async function fetchCardsByArchetype(archetype) {
 
 // Get trending / popular cards (highest ATK monsters as proxy)
 export async function fetchTrendingCards() {
-  return fetchCards({ sort: 'atk', num: 20, type: 'Effect Monster' });
+  return fetchCards({ sort: 'atk', num: 20, offset: 0, type: 'Effect Monster' });
 }
 
 // Get newest cards (sorted by ID descending as proxy for new, or API default)
 export async function fetchNewestCards(num = 20) {
-  return fetchCards({ sort: 'id', num });
+  return fetchCards({ sort: 'id', num, offset: 0 });
 }
 
 export default apiClient;
