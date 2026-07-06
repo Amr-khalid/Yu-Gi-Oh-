@@ -8,7 +8,7 @@ import { GiSwordBrandish, GiShield, GiCardPlay } from 'react-icons/gi';
 import SearchBar from '@/components/ui/SearchBar';
 import useCardStore from '@/store/useCardStore';
 import useUIStore from '@/store/useUIStore';
-import { searchCardsByName } from '@/lib/api';
+import { searchCardsByName, fetchCards } from '@/lib/api';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getCardImageUrl, formatStat, isExtraDeck } from '@/lib/cardUtils';
 import { getAttributeTheme, getCardTypeColor } from '@/lib/cardTheme';
@@ -118,15 +118,28 @@ export default function DeckBuilderPage() {
   const { addToast } = useUIStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [defaultCards, setDefaultCards] = useState([]);
   const [searching, setSearching] = useState(false);
 
   const debouncedQuery = useDebounce(searchQuery, 350);
 
+  // Fetch default LIGHT cards on mount
+  useEffect(() => {
+    fetchCards({ attribute: 'LIGHT', num: 20, offset: 0 })
+      .then((res) => {
+        setDefaultCards(res?.data || []);
+        setSearchResults(res?.data || []);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSearch = useCallback(async (q) => {
-    if (!q || q.length < 2) { setSearchResults([]); return; }
+    if (!q || q.length < 2) {
+      setSearchResults(defaultCards);
+      return;
+    }
     setSearching(true);
     try {
-      // Must pass both num and offset to satisfy YGOPRODeck API constraints
       const res = await searchCardsByName(q, { num: 20, offset: 0 });
       setSearchResults(res?.data || []);
     } catch (err) {
@@ -134,12 +147,16 @@ export default function DeckBuilderPage() {
     } finally {
       setSearching(false);
     }
-  }, []);
+  }, [defaultCards]);
 
   // auto-search on debounce
   useEffect(() => {
-    handleSearch(debouncedQuery);
-  }, [debouncedQuery, handleSearch]);
+    if (!debouncedQuery || debouncedQuery.length < 2) {
+      setSearchResults(defaultCards);
+    } else {
+      handleSearch(debouncedQuery);
+    }
+  }, [debouncedQuery, defaultCards, handleSearch]);
 
   const handleAddCard = (card) => {
     addCardToDeck(card);

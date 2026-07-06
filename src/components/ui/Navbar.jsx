@@ -14,8 +14,9 @@ import useCardStore from '@/store/useCardStore';
 const NAV_LINKS = [
   { href: '/', label: 'Home', icon: GiCardPlay },
   { href: '/cards', label: 'Explorer', icon: GiMagnifyingGlass },
+    { href: '/leaderboards', label: 'Leaderboards', icon: GiTrophyCup },
+
   { href: '/deck-builder', label: 'Deck Builder', icon: GiSwordBrandish },
-  { href: '/leaderboards', label: 'Leaderboards', icon: GiTrophyCup },
   { href: '/favorites', label: 'Favorites', icon: GiBookmarklet },
 ];
 
