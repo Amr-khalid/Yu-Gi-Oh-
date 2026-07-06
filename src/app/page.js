@@ -40,9 +40,20 @@ export default function HomePage() {
   const [dailyCard, setDailyCard] = useState(null);
   const [trendingCards, setTrendingCards] = useState([]);
   const [newestCards, setNewestCards] = useState([]);
+  const [strongMonsters, setStrongMonsters] = useState([]);
+  const [strongIndex, setStrongIndex] = useState(0);
   const [loadingRandom, setLoadingRandom] = useState(false);
   const { setDailyCard: storeDailyCard } = useUIStore();
   const { addRecentlyViewed } = useCardStore();
+
+  // Auto-rotate slideshow every 7 seconds
+  useEffect(() => {
+    if (strongMonsters.length === 0) return;
+    const interval = setInterval(() => {
+      setStrongIndex((prev) => (prev + 1) % strongMonsters.length);
+    }, 7000);
+    return () => clearInterval(interval);
+  }, [strongMonsters]);
 
   useEffect(() => {
     // Fetch daily featured card
@@ -51,8 +62,13 @@ export default function HomePage() {
       storeDailyCard(card);
     }).catch(() => {});
 
-    // Fetch trending
+    // Fetch top 5 strongest monsters
     fetchTrendingCards().then((res) => {
+      const sorted = (res?.data || [])
+        .filter(c => c.atk && !isNaN(c.atk))
+        .sort((a, b) => parseInt(b.atk) - parseInt(a.atk))
+        .slice(0, 5);
+      setStrongMonsters(sorted);
       setTrendingCards(res?.data?.slice(0, 6) || []);
     }).catch(() => {});
 
@@ -102,9 +118,9 @@ export default function HomePage() {
           <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
             <span className="block text-white">YU-GI-OH</span>
             <span
-              className="block text-transparent bg-clip-text"
+              className="block text-white"
               style={{
-                backgroundImage: 'linear-gradient(135deg, #7c3aed, #06b6d4, #f59e0b)',
+                textShadow: '0 1px 0 #ccc, 0 2px 0 #c5c5c5, 0 3px 0 #bbb, 0 4px 0 #b0b0b0, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)',
               }}
             >
               CARD EXPLORER
@@ -114,6 +130,115 @@ export default function HomePage() {
             Explore 12,000+ cards in stunning 3D. Build decks. Discover legends.
           </p>
         </motion.div>
+
+        {/* 5 Strongest Monsters Slideshow - Rotates every 7 seconds */}
+        <div className="relative z-10 w-full max-w-5xl mb-12">
+          <div className="glass rounded-3xl border border-white/10 p-6 md:p-8 relative overflow-hidden bg-black/40 backdrop-blur-md">
+            <div className="absolute top-4 left-4 z-20">
+              <span className="px-3 py-1 rounded-full text-[10px] font-display font-bold tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                🏆 LEGENDARY MONSTERS SHIELD
+              </span>
+            </div>
+            
+            <div className="flex flex-col lg:flex-row items-center gap-8 min-h-[360px]">
+              {/* Rotating 3D Hero Card Display */}
+              <div className="relative w-56 h-80 flex-shrink-0">
+                <AnimatePresence mode="wait">
+                  {strongMonsters[strongIndex] && (
+                    <motion.div
+                      key={strongMonsters[strongIndex].id}
+                      className="absolute inset-0"
+                      initial={{ opacity: 0, scale: 0.8, x: -50, rotateY: -30 }}
+                      animate={{ opacity: 1, scale: 1, x: 0, rotateY: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, x: 50, rotateY: 30 }}
+                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                    >
+                      <HeroCard3D card={strongMonsters[strongIndex]} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Monster Stats and Info panel */}
+              <div className="flex-1 w-full min-w-0">
+                <AnimatePresence mode="wait">
+                  {strongMonsters[strongIndex] && (
+                    <motion.div
+                      key={strongMonsters[strongIndex].id}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -30 }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <h3 className="font-display text-2xl md:text-3xl font-black text-white leading-tight">
+                          {strongMonsters[strongIndex].name}
+                        </h3>
+                        <p className="text-xs font-display tracking-widest text-violet-400/80 mt-1 uppercase">
+                          ✦ {strongMonsters[strongIndex].race} / {strongMonsters[strongIndex].type}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-6">
+                        <div>
+                          <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">ATTACK POWER</p>
+                          <p className="font-display text-2xl font-black text-amber-400">
+                            {formatStat(strongMonsters[strongIndex].atk)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">DEFENSE POWER</p>
+                          <p className="font-display text-2xl font-black text-cyan-400">
+                            {formatStat(strongMonsters[strongIndex].def)}
+                          </p>
+                        </div>
+                        {strongMonsters[strongIndex].level && (
+                          <div>
+                            <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">STAR LEVEL</p>
+                            <p className="font-display text-2xl font-black text-yellow-300">
+                              ★ {strongMonsters[strongIndex].level}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <p className="text-sm text-white/50 leading-relaxed line-clamp-3">
+                        {strongMonsters[strongIndex].desc}
+                      </p>
+
+                      <div className="flex items-center gap-3">
+                        <Link href={`/cards/${strongMonsters[strongIndex].id}`}>
+                          <motion.button
+                            className="btn-primary px-5 py-2.5 rounded-xl text-xs flex items-center gap-2"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                          >
+                            <FiZap />
+                            Summon Details
+                          </motion.button>
+                        </Link>
+                        
+                        {/* Selector dots */}
+                        <div className="flex gap-1.5 ml-auto">
+                          {strongMonsters.map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setStrongIndex(idx)}
+                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                idx === strongIndex ? 'bg-amber-400 w-5' : 'bg-white/20 hover:bg-white/40'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* 3D Card + Info row */}
         <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 w-full max-w-5xl">
