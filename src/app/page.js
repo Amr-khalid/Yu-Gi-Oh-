@@ -166,17 +166,19 @@ export default function HomePage() {
                         transition={{ duration: 0.8, ease: "easeInOut" }}
                       >
                         {/* Image Fallback Render */}
-                        <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
-                          <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                            <Image
-                              src={strongMonsters[strongIndex].card_images?.[0]?.image_url}
-                              alt={strongMonsters[strongIndex].name}
-                              fill
-                              className="object-contain"
-                              unoptimized
-                            />
+                        {strongMonsters[strongIndex].card_images?.[0]?.image_url && (
+                          <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
+                            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+                              <Image
+                                src={strongMonsters[strongIndex].card_images[0].image_url}
+                                alt={strongMonsters[strongIndex].name}
+                                fill
+                                className="object-contain"
+                                unoptimized
+                              />
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* Transparent 3D Overlay */}
                         <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
@@ -291,17 +293,19 @@ export default function HomePage() {
             transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
           >
             {/* Image Fallback Render */}
-            <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
-              <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
-                <Image
-                  src={dailyCard?.card_images?.[0]?.image_url}
-                  alt={dailyCard?.name || "Featured Card"}
-                  fill
-                  className="object-contain"
-                  unoptimized
-                />
+            {dailyCard?.card_images?.[0]?.image_url && (
+              <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
+                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
+                  <Image
+                    src={dailyCard.card_images[0].image_url}
+                    alt={dailyCard.name || "Featured Card"}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Transparent 3D Overlay */}
             <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
