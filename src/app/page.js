@@ -73,15 +73,21 @@ export default function HomePage() {
         })
         .slice(0, 5);
       
+      // If API returns cards but filter was too strict, use raw slice
       if (sorted.length > 0) {
         setStrongMonsters(sorted);
       } else if (apiCards.length > 0) {
         setStrongMonsters(apiCards.slice(0, 5));
       }
-      setTrendingCards(apiCards.slice(0, 6));
     }).catch((err) => {
       console.error("Error fetching trending cards for slideshow:", err);
     });
+
+    // Fetch Divine Cards (attribute: 'DIVINE')
+    fetchCards({ attribute: 'DIVINE', num: 20, offset: 0 }).then((res) => {
+      const apiCards = res?.data || [];
+      setTrendingCards(apiCards.slice(0, 6));
+    }).catch(() => {});
 
     // Fetch newest cards (fetch recent and sort by id desc client-side)
     fetchCards({ num: 30, offset: 0 }).then((res) => {
@@ -334,7 +340,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Trending Cards Section */}
+      {/* Divine Cards Section */}
       {trendingCards.length > 0 && (
         <section className="relative z-10 px-4 sm:px-6 py-12 max-w-7xl mx-auto">
           <motion.div
@@ -344,12 +350,12 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             <div className="flex items-center gap-3">
-              <GiFlame className="text-2xl text-orange-500" />
+              <GiTrophyCup className="text-2xl text-yellow-500" />
               <h2 className="font-display text-2xl font-bold tracking-wider text-white">
-                TRENDING CARDS
+                DIVINE CARDS
               </h2>
             </div>
-            <Link href="/cards?sort=atk">
+            <Link href="/cards?attribute=DIVINE">
               <motion.button
                 className="flex items-center gap-1 text-sm text-violet-400 hover:text-violet-300 transition-colors font-display tracking-wider"
                 whileHover={{ x: 3 }}
