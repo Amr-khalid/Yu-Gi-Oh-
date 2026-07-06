@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   GiFlame, GiLightningTrio, GiCrystalBall, GiSwordBrandish,
   GiCardRandom, GiTrophyCup,
@@ -142,7 +143,7 @@ export default function HomePage() {
             
             <div className="flex flex-col lg:flex-row items-center gap-8 min-h-[360px]">
               {/* Rotating 3D Hero Card Display */}
-              <div className="relative w-56 h-80 flex-shrink-0">
+              <div className="relative w-56 h-80 flex-shrink-0 group">
                 <AnimatePresence mode="wait">
                   {strongMonsters[strongIndex] && (
                     <motion.div
@@ -153,7 +154,23 @@ export default function HomePage() {
                       exit={{ opacity: 0, scale: 0.8, x: 50, rotateY: 30 }}
                       transition={{ duration: 0.8, ease: "easeInOut" }}
                     >
-                      <HeroCard3D card={strongMonsters[strongIndex]} />
+                      {/* Image Fallback Render */}
+                      <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
+                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+                          <Image
+                            src={strongMonsters[strongIndex].card_images?.[0]?.image_url}
+                            alt={strongMonsters[strongIndex].name}
+                            fill
+                            className="object-contain"
+                            unoptimized
+                          />
+                        </div>
+                      </div>
+
+                      {/* Transparent 3D Overlay */}
+                      <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
+                        <HeroCard3D card={strongMonsters[strongIndex]} />
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -244,12 +261,28 @@ export default function HomePage() {
         <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 w-full max-w-5xl">
           {/* 3D Card */}
           <motion.div
-            className="relative w-64 h-96 lg:w-72 lg:h-[420px] flex-shrink-0"
+            className="relative w-64 h-96 lg:w-72 lg:h-[420px] flex-shrink-0 group"
             initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
             animate={{ opacity: 1, scale: 1, rotateY: 0 }}
             transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
           >
-            <HeroCard3D card={dailyCard} />
+            {/* Image Fallback Render */}
+            <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
+              <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
+                <Image
+                  src={dailyCard?.card_images?.[0]?.image_url}
+                  alt={dailyCard?.name || "Featured Card"}
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+
+            {/* Transparent 3D Overlay */}
+            <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
+              <HeroCard3D card={dailyCard} />
+            </div>
           </motion.div>
 
           {/* Card Info */}
