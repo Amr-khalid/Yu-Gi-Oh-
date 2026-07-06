@@ -1,0 +1,38 @@
+{
+  "name": "Yu-Gi-Oh! Ultimate Card Explorer",
+  "short_name": "YGO Explorer",
+  "description": "The most immersive Yu-Gi-Oh! card database. Explore 12,000+ cards in stunning 3D.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#04000d",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Card Explorer",
+      "url": "/cards",
+      "description": "Browse all cards"
+    },
+    {
+      "name": "Deck Builder",
+      "url": "/deck-builder",
+      "description": "Build your deck"
+    }
+  ]
+}
