@@ -109,18 +109,37 @@ export default function CardDetailPage({ params }) {
           >
             {/* 3D Canvas */}
             <div
-              className="h-[500px] sm:h-[600px] rounded-3xl overflow-hidden relative"
+              className="h-[500px] sm:h-[600px] rounded-3xl overflow-hidden relative group"
               style={{
                 background: `radial-gradient(ellipse at center, ${theme.primary}12 0%, rgba(4,0,13,0.8) 70%)`,
                 border: `1px solid ${theme.primary}25`,
                 boxShadow: `0 0 60px ${theme.primary}15, inset 0 0 60px ${theme.primary}05`,
               }}
             >
-              <CardScene card={{ ...card, card_images: [{ image_url: currentImage?.image_url }] }} />
+              {/* Guaranteed Image Fallback Render in case WebGL / CORS blocks loading */}
+              <div className="absolute inset-0 z-0 flex items-center justify-center p-8">
+                <div className="relative w-full h-full max-w-[340px] max-h-[496px] rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
+                  <Image
+                    src={currentImage?.image_url}
+                    alt={card.name}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                    priority
+                  />
+                  {/* Subtle foil dynamic reflection effect on fallback */}
+                  <div className="absolute inset-0 opacity-20 bg-gradient-to-tr from-transparent via-white to-transparent pointer-events-none" />
+                </div>
+              </div>
+
+              {/* R3F 3D Scene rendered on top. It remains transparent/interactable */}
+              <div className="absolute inset-0 z-10 pointer-events-auto">
+                <CardScene card={{ ...card, card_images: [{ image_url: currentImage?.image_url }] }} />
+              </div>
 
               {/* Power level badge */}
               {powerLevel >= 3 && (
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 z-20">
                   <motion.div
                     className="px-3 py-1.5 rounded-full text-xs font-display font-bold tracking-wider"
                     style={{
