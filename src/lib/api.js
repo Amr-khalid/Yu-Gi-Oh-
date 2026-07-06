@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://db.ygoprodeck.com/api/v7';
+const BASE_URL = '/api/v7';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,

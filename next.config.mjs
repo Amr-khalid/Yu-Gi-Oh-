@@ -43,6 +43,15 @@ const nextConfig = {
       },
     ];
   },
+  // Proxies to bypass CORS limitations on localhost origin
+  async rewrites() {
+    return [
+      {
+        source: '/api/v7/:path*',
+        destination: 'https://db.ygoprodeck.com/api/v7/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
