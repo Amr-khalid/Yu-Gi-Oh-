@@ -67,7 +67,7 @@ export default function HomePage() {
     }).catch(() => {});
 
     // Fetch top 5 strongest monsters (Fusion, Synchro, XYZ)
-    fetchFilteredCards({ sort: 'atk', num: 60 }).then((res) => {
+    fetchCards({ num: 100 }).then((res) => {
       const apiCards = res?.data || [];
       const filteredTypes = ['xyz monster', 'synchro monster', 'fusion monster'];
       
@@ -83,7 +83,6 @@ export default function HomePage() {
         })
         .slice(0, 5);
       
-      // If API returns cards but filter was too strict, use raw slice
       if (sorted.length > 0) {
         setStrongMonsters(sorted);
       } else if (apiCards.length > 0) {
@@ -94,9 +93,11 @@ export default function HomePage() {
       console.error("Error fetching trending cards for slideshow:", err);
     });
 
-    // Fetch newest
-    fetchNewestCards(6).then((res) => {
-      setNewestCards(res?.data?.slice(0, 6) || []);
+    // Fetch newest cards (fetch recent and sort by id desc client-side)
+    fetchCards({ num: 30 }).then((res) => {
+      const apiCards = res?.data || [];
+      const sorted = [...apiCards].sort((a, b) => parseInt(b.id) - parseInt(a.id));
+      setNewestCards(sorted.slice(0, 6));
     }).catch(() => {});
   }, []);
 
