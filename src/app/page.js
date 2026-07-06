@@ -65,13 +65,26 @@ export default function HomePage() {
 
     // Fetch top 5 strongest monsters
     fetchTrendingCards().then((res) => {
-      const sorted = (res?.data || [])
-        .filter(c => c.atk && !isNaN(c.atk))
-        .sort((a, b) => parseInt(b.atk) - parseInt(a.atk))
+      const apiCards = res?.data || [];
+      const sorted = apiCards
+        .filter(c => c.atk !== undefined && c.atk !== null)
+        .sort((a, b) => {
+          const atkA = parseInt(a.atk) || 0;
+          const atkB = parseInt(b.atk) || 0;
+          return atkB - atkA;
+        })
         .slice(0, 5);
-      setStrongMonsters(sorted);
-      setTrendingCards(res?.data?.slice(0, 6) || []);
-    }).catch(() => {});
+      
+      // If API returns cards but filter was too strict, use raw slice
+      if (sorted.length > 0) {
+        setStrongMonsters(sorted);
+      } else if (apiCards.length > 0) {
+        setStrongMonsters(apiCards.slice(0, 5));
+      }
+      setTrendingCards(apiCards.slice(0, 6));
+    }).catch((err) => {
+      console.error("Error fetching trending cards for slideshow:", err);
+    });
 
     // Fetch newest
     fetchNewestCards(6).then((res) => {
@@ -145,33 +158,39 @@ export default function HomePage() {
               {/* Rotating 3D Hero Card Display */}
               <div className="relative w-56 h-80 flex-shrink-0 group">
                 <AnimatePresence mode="wait">
-                  {strongMonsters[strongIndex] && (
-                    <motion.div
-                      key={strongMonsters[strongIndex].id}
-                      className="absolute inset-0"
-                      initial={{ opacity: 0, scale: 0.8, x: -50, rotateY: -30 }}
-                      animate={{ opacity: 1, scale: 1, x: 0, rotateY: 0 }}
-                      exit={{ opacity: 0, scale: 0.8, x: 50, rotateY: 30 }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
-                    >
-                      {/* Image Fallback Render */}
-                      <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
-                        <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                          <Image
-                            src={strongMonsters[strongIndex].card_images?.[0]?.image_url}
-                            alt={strongMonsters[strongIndex].name}
-                            fill
-                            className="object-contain"
-                            unoptimized
-                          />
+                  {strongMonsters.length > 0 ? (
+                    strongMonsters[strongIndex] && (
+                      <motion.div
+                        key={strongMonsters[strongIndex].id}
+                        className="absolute inset-0"
+                        initial={{ opacity: 0, scale: 0.8, x: -50, rotateY: -30 }}
+                        animate={{ opacity: 1, scale: 1, x: 0, rotateY: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, x: 50, rotateY: 30 }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                      >
+                        {/* Image Fallback Render */}
+                        <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
+                          <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+                            <Image
+                              src={strongMonsters[strongIndex].card_images?.[0]?.image_url}
+                              alt={strongMonsters[strongIndex].name}
+                              fill
+                              className="object-contain"
+                              unoptimized
+                            />
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Transparent 3D Overlay */}
-                      <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
-                        <HeroCard3D card={strongMonsters[strongIndex]} />
-                      </div>
-                    </motion.div>
+                        {/* Transparent 3D Overlay */}
+                        <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
+                          <HeroCard3D card={strongMonsters[strongIndex]} />
+                        </div>
+                      </motion.div>
+                    )
+                  ) : (
+                    <div className="w-full h-full rounded-2xl shimmer flex items-center justify-center">
+                      <p className="text-white/20 text-xs font-display">SUMMONING...</p>
+                    </div>
                   )}
                 </AnimatePresence>
               </div>
@@ -179,77 +198,85 @@ export default function HomePage() {
               {/* Monster Stats and Info panel */}
               <div className="flex-1 w-full min-w-0">
                 <AnimatePresence mode="wait">
-                  {strongMonsters[strongIndex] && (
-                    <motion.div
-                      key={strongMonsters[strongIndex].id}
-                      initial={{ opacity: 0, x: 30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="space-y-4"
-                    >
-                      <div>
-                        <h3 className="font-display text-2xl md:text-3xl font-black text-white leading-tight">
-                          {strongMonsters[strongIndex].name}
-                        </h3>
-                        <p className="text-xs font-display tracking-widest text-violet-400/80 mt-1 uppercase">
-                          ✦ {strongMonsters[strongIndex].race} / {strongMonsters[strongIndex].type}
-                        </p>
-                      </div>
+                  {strongMonsters.length > 0 ? (
+                    strongMonsters[strongIndex] && (
+                      <motion.div
+                        key={strongMonsters[strongIndex].id}
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -30 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <h3 className="font-display text-2xl md:text-3xl font-black text-white leading-tight">
+                            {strongMonsters[strongIndex].name}
+                          </h3>
+                          <p className="text-xs font-display tracking-widest text-violet-400/80 mt-1 uppercase">
+                            ✦ {strongMonsters[strongIndex].race} / {strongMonsters[strongIndex].type}
+                          </p>
+                        </div>
 
-                      <div className="flex gap-6">
-                        <div>
-                          <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">ATTACK POWER</p>
-                          <p className="font-display text-2xl font-black text-amber-400">
-                            {formatStat(strongMonsters[strongIndex].atk)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">DEFENSE POWER</p>
-                          <p className="font-display text-2xl font-black text-cyan-400">
-                            {formatStat(strongMonsters[strongIndex].def)}
-                          </p>
-                        </div>
-                        {strongMonsters[strongIndex].level && (
+                        <div className="flex gap-6">
                           <div>
-                            <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">STAR LEVEL</p>
-                            <p className="font-display text-2xl font-black text-yellow-300">
-                              ★ {strongMonsters[strongIndex].level}
+                            <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">ATTACK POWER</p>
+                            <p className="font-display text-2xl font-black text-amber-400">
+                              {formatStat(strongMonsters[strongIndex].atk)}
                             </p>
                           </div>
-                        )}
-                      </div>
-
-                      <p className="text-sm text-white/50 leading-relaxed line-clamp-3">
-                        {strongMonsters[strongIndex].desc}
-                      </p>
-
-                      <div className="flex items-center gap-3">
-                        <Link href={`/cards/${strongMonsters[strongIndex].id}`}>
-                          <motion.button
-                            className="btn-primary px-5 py-2.5 rounded-xl text-xs flex items-center gap-2"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                          >
-                            <FiZap />
-                            Summon Details
-                          </motion.button>
-                        </Link>
-                        
-                        {/* Selector dots */}
-                        <div className="flex gap-1.5 ml-auto">
-                          {strongMonsters.map((_, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setStrongIndex(idx)}
-                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                idx === strongIndex ? 'bg-amber-400 w-5' : 'bg-white/20 hover:bg-white/40'
-                              }`}
-                            />
-                          ))}
+                          <div>
+                            <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">DEFENSE POWER</p>
+                            <p className="font-display text-2xl font-black text-cyan-400">
+                              {formatStat(strongMonsters[strongIndex].def)}
+                            </p>
+                          </div>
+                          {strongMonsters[strongIndex].level && (
+                            <div>
+                              <p className="text-[10px] text-white/30 font-display tracking-wider mb-0.5">STAR LEVEL</p>
+                              <p className="font-display text-2xl font-black text-yellow-300">
+                                ★ {strongMonsters[strongIndex].level}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </motion.div>
+
+                        <p className="text-sm text-white/50 leading-relaxed line-clamp-3">
+                          {strongMonsters[strongIndex].desc}
+                        </p>
+
+                        <div className="flex items-center gap-3">
+                          <Link href={`/cards/${strongMonsters[strongIndex].id}`}>
+                            <motion.button
+                              className="btn-primary px-5 py-2.5 rounded-xl text-xs flex items-center gap-2"
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                            >
+                              <FiZap />
+                              Summon Details
+                            </motion.button>
+                          </Link>
+                          
+                          {/* Selector dots */}
+                          <div className="flex gap-1.5 ml-auto">
+                            {strongMonsters.map((_, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setStrongIndex(idx)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                  idx === strongIndex ? 'bg-amber-400 w-5' : 'bg-white/20 hover:bg-white/40'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="h-8 w-48 rounded shimmer" />
+                      <div className="h-6 w-32 rounded shimmer" />
+                      <div className="h-16 w-full rounded shimmer" />
+                    </div>
                   )}
                 </AnimatePresence>
               </div>
