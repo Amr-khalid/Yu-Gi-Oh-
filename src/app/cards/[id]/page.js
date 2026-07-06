@@ -167,12 +167,31 @@ export default function CardDetailPage({ params }) {
             {/* Type + Attribute badges */}
             <div className="flex flex-wrap gap-2">
               {card.attribute && (
-                <span
-                  className="px-3 py-1 rounded-full text-xs font-display font-bold tracking-wider border"
-                  style={{ color: theme.primary, borderColor: theme.primary + '40', background: theme.primary + '15' }}
+                <motion.span
+                  className="px-4 py-1.5 rounded-full text-xs font-display font-bold tracking-widest border flex items-center gap-2 shadow-lg"
+                  style={{
+                    color: theme.primary,
+                    borderColor: theme.primary,
+                    background: `${theme.primary}18`,
+                    boxShadow: `0 0 15px ${theme.glow}, inset 0 0 8px ${theme.glow}`,
+                    textShadow: `0 0 8px ${theme.primary}`,
+                  }}
+                  animate={{
+                    boxShadow: [
+                      `0 0 10px ${theme.glow}, inset 0 0 5px ${theme.glow}`,
+                      `0 0 25px ${theme.primary}80, inset 0 0 12px ${theme.primary}50`,
+                      `0 0 10px ${theme.glow}, inset 0 0 5px ${theme.glow}`
+                    ]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
                 >
+                  <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: theme.primary }} />
                   {card.attribute} {theme.emoji}
-                </span>
+                </motion.span>
               )}
               {card.humanReadableCardType && (
                 <span className="px-3 py-1 rounded-full text-xs font-display tracking-wider border border-white/10 text-white/50">
