@@ -116,8 +116,8 @@ export default function CardDetailPage({ params }) {
                 boxShadow: `0 0 60px ${theme.primary}15, inset 0 0 60px ${theme.primary}05`,
               }}
             >
-              {/* Guaranteed Image Fallback Render in case WebGL / CORS blocks loading */}
-              <div className="absolute inset-0 z-0 flex items-center justify-center p-8">
+              {/* Guaranteed Image Fallback Render (acts as card texture background) */}
+              <div className="absolute inset-0 z-0 flex items-center justify-center p-8 pointer-events-none">
                 <div className="relative w-full h-full max-w-[340px] max-h-[496px] rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
                   <Image
                     src={currentImage?.image_url}
@@ -127,13 +127,11 @@ export default function CardDetailPage({ params }) {
                     unoptimized
                     priority
                   />
-                  {/* Subtle foil dynamic reflection effect on fallback */}
-                  <div className="absolute inset-0 opacity-20 bg-gradient-to-tr from-transparent via-white to-transparent pointer-events-none" />
                 </div>
               </div>
 
-              {/* R3F 3D Scene rendered on top. It remains transparent/interactable */}
-              <div className="absolute inset-0 z-10 pointer-events-auto">
+              {/* R3F 3D Scene rendered on top as a transparent interactable layer, adding 3D effects */}
+              <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
                 <CardScene card={{ ...card, card_images: [{ image_url: currentImage?.image_url }] }} />
               </div>
 

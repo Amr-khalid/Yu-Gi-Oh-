@@ -75,7 +75,9 @@ function CardMesh({ imageUrl, attribute }) {
           <planeGeometry args={[2.5, 3.6, 32, 32]} />
           <meshStandardMaterial
             map={texture || undefined}
-            color={texture ? undefined : '#201035'}
+            color={texture ? undefined : '#ffffff'}
+            transparent={!texture}
+            opacity={texture ? 1 : 0}
             roughness={0.15}
             metalness={0.3}
             envMapIntensity={2}
