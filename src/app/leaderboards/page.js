@@ -88,7 +88,9 @@ export default function LeaderboardsPage() {
   useEffect(() => {
     if (cards[activeTab]) return;
     setLoading(true);
-    fetchCards(currentTab.params)
+    // Ensure both num and offset are sent to satisfy API requirements
+    const fetchParams = { ...currentTab.params, offset: 0 };
+    fetchCards(fetchParams)
       .then((res) => {
         let data = res?.data || [];
 
