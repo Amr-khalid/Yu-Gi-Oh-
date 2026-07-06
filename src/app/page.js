@@ -10,7 +10,7 @@ import {
   GiCardRandom, GiTrophyCup,
 } from 'react-icons/gi';
 import { FiSearch, FiChevronRight, FiZap } from 'react-icons/fi';
-import { fetchRandomCard, fetchTrendingCards, fetchNewestCards } from '@/lib/api';
+import { fetchRandomCard, fetchTrendingCards, fetchNewestCards, fetchFilteredCards } from '@/lib/api';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getAttributeTheme, getFrameTheme } from '@/lib/cardTheme';
 import { formatStat, getATKPowerLevel } from '@/lib/cardUtils';
