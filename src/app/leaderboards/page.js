@@ -11,7 +11,7 @@ import { getAttributeTheme } from '@/lib/cardTheme';
 
 const TABS = [
   { id: 'atk', label: 'Highest ATK', icon: GiSwordBrandish, color: '#f59e0b', params: { sort: 'atk', type: 'Effect Monster', num: 20 } },
-  { id: 'newest', label: 'Newest Cards', icon: FiCalendar, color: '#22c55e', params: { sort: 'new', num: 20 } },
+  { id: 'newest', label: 'Newest Cards', icon: FiCalendar, color: '#22c55e', params: { sort: 'id', num: 20 } },
   { id: 'price', label: 'Most Expensive', icon: FiDollarSign, color: '#06b6d4', params: { num: 50 } },
   { id: 'dark', label: 'DARK Monsters', icon: GiDiamonds, color: '#9b59b6', params: { attribute: 'DARK', num: 20 } },
   { id: 'divine', label: 'Divine Cards', icon: GiTrophyCup, color: '#ffd700', params: { attribute: 'DIVINE', num: 20 } },

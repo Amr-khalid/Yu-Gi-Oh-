@@ -31,16 +31,23 @@ function CardsPageInner() {
 
   const debouncedQuery = useDebounce(searchQuery, 350);
 
-  const queryParams = useMemo(() => ({
-    fname: debouncedQuery || undefined,
-    attribute: filters.attribute || undefined,
-    type: filters.type || undefined,
-    race: filters.race || undefined,
-    archetype: filters.archetype || undefined,
-    level: filters.level || undefined,
-    banlist: filters.banlist || undefined,
-    sort: filters.sort !== 'name' ? filters.sort : undefined,
-  }), [debouncedQuery, filters]);
+  const queryParams = useMemo(() => {
+    let apiSort = undefined;
+    if (filters.sort === 'atk') apiSort = 'atk';
+    if (filters.sort === 'def') apiSort = 'def';
+    if (filters.sort === 'new' || filters.sort === 'old') apiSort = 'id'; // use id as proxy for release age
+    
+    return {
+      fname: debouncedQuery || undefined,
+      attribute: filters.attribute || undefined,
+      type: filters.type || undefined,
+      race: filters.race || undefined,
+      archetype: filters.archetype || undefined,
+      level: filters.level || undefined,
+      banlist: filters.banlist || undefined,
+      sort: apiSort,
+    };
+  }, [debouncedQuery, filters]);
 
   // Initial / filter change fetch
   useEffect(() => {

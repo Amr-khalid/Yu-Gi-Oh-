@@ -155,9 +155,9 @@ export async function fetchTrendingCards() {
   return fetchCards({ sort: 'atk', num: 20, type: 'Effect Monster' });
 }
 
-// Get newest cards
+// Get newest cards (sorted by ID descending as proxy for new, or API default)
 export async function fetchNewestCards(num = 20) {
-  return fetchCards({ sort: 'new', num });
+  return fetchCards({ sort: 'id', num });
 }
 
 export default apiClient;
