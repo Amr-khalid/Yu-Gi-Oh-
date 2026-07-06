@@ -38,13 +38,11 @@ const QUICK_ACTIONS = [
 
 export default function HomePage() {
   const router = useRouter();
-  const [dailyCard, setDailyCard] = useState(null);
   const [trendingCards, setTrendingCards] = useState([]);
   const [newestCards, setNewestCards] = useState([]);
   const [strongMonsters, setStrongMonsters] = useState([]);
   const [strongIndex, setStrongIndex] = useState(0);
   const [loadingRandom, setLoadingRandom] = useState(false);
-  const { setDailyCard: storeDailyCard } = useUIStore();
   const { addRecentlyViewed } = useCardStore();
 
   // Auto-rotate slideshow every 7 seconds
@@ -57,14 +55,6 @@ export default function HomePage() {
   }, [strongMonsters]);
 
   useEffect(() => {
-    // Fetch daily featured card (simply get 1 card from info database safely)
-    fetchCards({ num: 1, offset: 0 }).then((res) => {
-      const card = res?.data?.[0];
-      if (card) {
-        setDailyCard(card);
-        storeDailyCard(card);
-      }
-    }).catch(() => {});
 
     // Fetch top 5 strongest monsters (Fusion, Synchro, XYZ)
     fetchCards({ num: 100, offset: 0 }).then((res) => {
@@ -115,9 +105,7 @@ export default function HomePage() {
     if (action === 'random') handleRandomCard();
   };
 
-  const theme = dailyCard?.attribute
-    ? getAttributeTheme(dailyCard.attribute)
-    : null;
+
 
   return (
     <div className="relative min-h-screen pb-24 md:pb-0">
@@ -287,125 +275,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 3D Card + Info row */}
-        <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8 w-full max-w-5xl">
-          {/* 3D Card */}
-          <motion.div
-            className="relative w-64 h-96 lg:w-72 lg:h-[420px] flex-shrink-0 group"
-            initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
-          >
-            {/* Image Fallback Render */}
-            {dailyCard?.card_images?.[0]?.image_url && (
-              <div className="absolute inset-0 z-0 flex items-center justify-center p-4 pointer-events-none">
-                <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl transition-transform duration-500 group-hover:scale-105">
-                  <Image
-                    src={dailyCard.card_images[0].image_url}
-                    alt={dailyCard.name || "Featured Card"}
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
-              </div>
-            )}
 
-            {/* Transparent 3D Overlay */}
-            <div className="absolute inset-0 z-10 pointer-events-auto mix-blend-screen opacity-90">
-              <HeroCard3D card={dailyCard} />
-            </div>
-          </motion.div>
-
-          {/* Card Info */}
-          {dailyCard && (
-            <motion.div
-              className="flex-1 max-w-lg"
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <div className="glass rounded-2xl p-6 border border-white/10">
-                <p className="text-xs font-display tracking-[0.3em] text-amber-400/70 mb-2 uppercase">
-                  ✦ Daily Featured Card
-                </p>
-                <h2 className="font-display text-xl md:text-2xl font-bold text-white mb-2">
-                  {dailyCard.name}
-                </h2>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {dailyCard.attribute && (
-                    <span
-                      className="px-2 py-0.5 rounded-full text-xs font-medium border"
-                      style={{
-                        color: theme?.primary,
-                        borderColor: theme?.primary + '44',
-                        background: theme?.primary + '18',
-                      }}
-                    >
-                      {dailyCard.attribute}
-                    </span>
-                  )}
-                  {dailyCard.race && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium border border-white/10 text-white/60">
-                      {dailyCard.race}
-                    </span>
-                  )}
-                  {dailyCard.type && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium border border-white/10 text-white/60">
-                      {dailyCard.humanReadableCardType || dailyCard.type}
-                    </span>
-                  )}
-                </div>
-
-                {/* ATK / DEF */}
-                {(dailyCard.atk !== undefined || dailyCard.def !== undefined) && (
-                  <div className="flex gap-4 mb-3">
-                    {dailyCard.atk !== undefined && (
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">ATK</p>
-                        <p className="font-display text-lg font-bold text-amber-400">
-                          {formatStat(dailyCard.atk)}
-                        </p>
-                      </div>
-                    )}
-                    {dailyCard.def !== undefined && (
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">DEF</p>
-                        <p className="font-display text-lg font-bold text-cyan-400">
-                          {formatStat(dailyCard.def)}
-                        </p>
-                      </div>
-                    )}
-                    {dailyCard.level && (
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">Level</p>
-                        <p className="font-display text-lg font-bold text-yellow-300">
-                          ★ {dailyCard.level}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <p className="text-sm text-white/50 leading-relaxed line-clamp-3 mb-4">
-                  {dailyCard.desc}
-                </p>
-
-                <Link href={`/cards/${dailyCard.id}`}>
-                  <motion.button
-                    className="btn-primary px-5 py-2.5 rounded-xl text-sm flex items-center gap-2"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    <FiZap />
-                    View Full Details
-                    <FiChevronRight />
-                  </motion.button>
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </div>
 
         {/* Search Bar */}
         <motion.div
