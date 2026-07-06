@@ -63,11 +63,16 @@ export default function HomePage() {
       storeDailyCard(card);
     }).catch(() => {});
 
-    // Fetch top 5 strongest monsters
-    fetchTrendingCards().then((res) => {
+    // Fetch top 5 strongest monsters (Fusion, Synchro, XYZ)
+    fetchFilteredCards({ sort: 'atk', num: 60 }).then((res) => {
       const apiCards = res?.data || [];
+      const filteredTypes = ['xyz monster', 'synchro monster', 'fusion monster'];
+      
       const sorted = apiCards
-        .filter(c => c.atk !== undefined && c.atk !== null)
+        .filter(c => {
+          const typeMatch = c.type && filteredTypes.includes(c.type.toLowerCase());
+          return typeMatch && c.atk !== undefined && c.atk !== null;
+        })
         .sort((a, b) => {
           const atkA = parseInt(a.atk) || 0;
           const atkB = parseInt(b.atk) || 0;
@@ -129,16 +134,8 @@ export default function HomePage() {
           >
             ✦ Ultimate Card Experience ✦
           </motion.p>
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
-            <span className="block text-white">YU-GI-OH</span>
-            <span
-              className="block text-white"
-              style={{
-                textShadow: '0 1px 0 #ccc, 0 2px 0 #c5c5c5, 0 3px 0 #bbb, 0 4px 0 #b0b0b0, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)',
-              }}
-            >
-              CARD EXPLORER
-            </span>
+          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-[0_5px_15px_rgba(124,58,237,0.3)]">
+            YU-GI-OH CARD EXPLORER
           </h1>
           <p className="mt-4 text-white/50 text-lg max-w-xl mx-auto font-light">
             Explore 12,000+ cards in stunning 3D. Build decks. Discover legends.
