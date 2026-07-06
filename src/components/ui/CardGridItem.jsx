@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { FiHeart } from 'react-icons/fi';
 import { GiSwordBrandish } from 'react-icons/gi';
 import { getCardImageUrl, formatStat, getATKPowerLevel } from '@/lib/cardUtils';
-import { getAttributeTheme, getCardTypeColor } from '@/lib/cardTheme';
+import { getAttributeTheme, getFrameTheme, getCardTypeColor } from '@/lib/cardTheme';
 import useCardStore from '@/store/useCardStore';
 import useUIStore from '@/store/useUIStore';
 
