@@ -10,7 +10,7 @@ import {
   GiCardRandom, GiTrophyCup,
 } from 'react-icons/gi';
 import { FiSearch, FiChevronRight, FiZap } from 'react-icons/fi';
-import { fetchRandomCard, fetchTrendingCards, fetchNewestCards, fetchFilteredCards } from '@/lib/api';
+import { fetchRandomCard, fetchTrendingCards, fetchNewestCards, fetchFilteredCards, fetchCards } from '@/lib/api';
 import { useDebounce } from '@/hooks/useDebounce';
 import { getAttributeTheme, getFrameTheme } from '@/lib/cardTheme';
 import { formatStat, getATKPowerLevel } from '@/lib/cardUtils';
@@ -57,10 +57,13 @@ export default function HomePage() {
   }, [strongMonsters]);
 
   useEffect(() => {
-    // Fetch daily featured card
-    fetchRandomCard().then((card) => {
-      setDailyCard(card);
-      storeDailyCard(card);
+    // Fetch daily featured card (simply get 1 card from info database safely)
+    fetchCards({ num: 1 }).then((res) => {
+      const card = res?.data?.[0];
+      if (card) {
+        setDailyCard(card);
+        storeDailyCard(card);
+      }
     }).catch(() => {});
 
     // Fetch top 5 strongest monsters (Fusion, Synchro, XYZ)
