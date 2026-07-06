@@ -140,8 +140,11 @@ export default function DeckBuilderPage() {
     }
     setSearching(true);
     try {
-      const res = await searchCardsByName(q, { num: 20, offset: 0 });
-      setSearchResults(res?.data || []);
+      // Fetch with attribute=LIGHT and double-check with client-side filter
+      const res = await searchCardsByName(q, { num: 20, offset: 0, attribute: 'LIGHT' });
+      const cards = res?.data || [];
+      const lightCards = cards.filter(c => c.attribute === 'LIGHT');
+      setSearchResults(lightCards);
     } catch (err) {
       setSearchResults([]);
     } finally {
