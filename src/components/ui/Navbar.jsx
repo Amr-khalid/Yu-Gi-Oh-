@@ -56,10 +56,6 @@ export default function Navbar() {
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                  <GiCardPlay className="text-white text-xl" />
-                </div>
-                <div className="absolute -inset-1 bg-gradient-to-br from-violet-600 to-cyan-500 rounded-lg blur opacity-30 group-hover:opacity-60 transition-opacity" />
               </motion.div>
               <div className="hidden sm:block">
                 <p className="font-display text-sm font-bold tracking-widest text-white leading-none">
